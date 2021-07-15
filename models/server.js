@@ -18,7 +18,7 @@ class Server {
     this.app.use(cors());
     
     //Lectora y parseo del body(sirve para evitar que ingresen scripts maliciosos a nuestro servidor)
-    this.app.use(express.json);
+    this.app.use(express.json());
     //PUBLIC DIRECTORY
     this.app.use(express.static("public"));
   }
