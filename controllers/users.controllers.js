@@ -9,15 +9,13 @@ const usersGet = (req = request, res = response) => {
 const userGet = (req, res = response) => {
   // const id = req.params.id;
   const id = req.params;
-
-  res.json({ msg: "get API" });
-};
-const userPost = (req = request, res = response) => {
+  //existen varias formas de obtener datos del req:
+  // req.query, req.body, req.params, req.params.nombreparametro
   const {name = 'no name', age = 18} = req.query;
   res.json({ msg: "post API", name, age });
 };
 const userPut = (req, res = response) => {
-  const {name, age} = req.body;
+  const {name, age} = req.body; 
   res.json({ msg: "put API" });
 };
 const userPatch = (req, res = response) => {
