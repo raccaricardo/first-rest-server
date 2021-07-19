@@ -1,8 +1,8 @@
 const bcrypt = require('bcryptjs');
 
 const encryptpass = (pass)=>{
-    salt = bcrypt.genSaltSync();
-    hash = bcrypt.hashSync(pass, salt);
+    const salt = bcrypt.genSaltSync();
+    const hash = bcrypt.hashSync(pass, salt);
     return hash;
 }
 

@@ -1,5 +1,5 @@
 const { response, request } = require("express");
-const { body, validationResult } = require('express-validator');
+const bcrypt = require('bcryptjs');
 
 
 
@@ -8,19 +8,34 @@ const { encryptpass } = require("../helpers/encrypt");
 
 
 
-const userGet = (req = request, res = response) => {
-  const { q, name = "No name", apikey, page = 1, limit } = req.query;
+const userGet = async (req = request, res = response) => {
+  const { id } = req.params;
+  const user = await User.findById(id);
   res.json({
-    msg: "get API - controlador",
-    q,
-    name,
-    apikey,
-    page,
-    limit,
+    user
   });
 };
+const usersGet = async (req = request, res = response) => {
+  let { limit = 5, from = 0 } = req.query;
 
-const usersPost = async (req = request, res = response) => {
+  ( isNaN( limit ) ) ? limit = 10 : true;
+  ( isNaN( from ) ) ? from = 0 : true;
+  // const users = await User.find()
+  const query = { active: true };    
+  const resp = await Promise.all([
+    User.countDocuments(query),
+    User.find( query )
+      .skip( Number( from ) )
+      .limit( Number( limit ) )    
+  ])
+  const [totalUsers, users] = resp  ;
+  res.json({
+    totalUsers, 
+    users
+    
+  });
+};
+const userPost = async (req = request, res = response) => {
  
   const body = req.body;
   /**
@@ -32,57 +47,70 @@ const usersPost = async (req = request, res = response) => {
     email,
     password,
     img = "",
-    rol = "USER_ROLE",
+    role = "USER_ROLE",
     active = true,
     google = false,
   } = body;
-  const user = new User({ name, email, password, img, rol, active, google });
+  const user = new User({ name, email, password, img, role, active, google });
   //verif if email exist
-  const emailExist = await user.findOne({ email });
-  if( emailExist ){
-    return res.status(400).json({
-      msg:'El correo ya se encuentra registrado'
-    })
-  }
   // encrypt password
   const pass = await encryptpass(user.password);
   user.password = pass;
   console.log("password encriptada:", pass);
   //save in db
   await user.save();
+
+
   res.json({
-    msg: "post API - usersPost",
-    name,
-    email,
+    user
   });
 };
 
-// const usersPut = (req, res = response) => {
-//   const { id } = req.params;
+const userPut = async (req, res = response) => {
+  const { id } = req.params;
+  const { _id, password, google, ...remains } = req.body; //google no se actualiza porque lo extraemos de remains
+  //TODO validate db 
+  if(password){
+   
+    const salt = bcrypt.genSaltSync();  
+    remains.password = bcrypt.hashSync(password, salt);
+    console.log(` password: ${password} password encriptada:${remains.password}`);
+  }
+    const user = await User.findByIdAndUpdate(id, remains);
+    console.log(user);
+    delete remains.password;
+  res.json({
+    remains
+  });
+};
 
+// const userPatch = (req, res = response) => {
 //   res.json({
-//     msg: "put API - usersPut",
-//     id,
+//     msg: "patch API - userPatch",
 //   });
 // };
 
-// const usersPatch = (req, res = response) => {
-//   res.json({
-//     msg: "patch API - usersPatch",
-//   });
-// };
-
-// const usersDelete = (req, res = response) => {
-//   res.json({
-//     msg: "delete API - usersDelete",
-//   });
-// };
+const userDelete = async (req = request, res = response) => {
+  
+  const { id } = req.params;
+  /*delete from id
+  const user = await User.findByIdAndDelete(id);
+  */
+  /*
+  change state of user to active = false 
+  */
+  const user = await User.findByIdAndUpdate(id, {active: false} );
+  res.json({
+    msg: "delete API - userDelete",
+    user
+  });
+};
 
 module.exports = {
   userGet,
   usersGet,
-  usersPost,
-  usersPut,
-  usersPatch,
-  usersDelete,
+  userPost,
+  userPut,
+  // userPatch,
+  userDelete,
 };

@@ -1,35 +1,57 @@
 
 const { Router } = require('express');
-const { check } = require('express-validator'); 
+const { check } = require('express-validator');
 const { userGet,
-        usersGet,
-        usersPut,
-        usersPost,
-        usersDelete,
-        usersPatch } = require('../controllers/users.controllers');
+    usersGet,
+    userPut,
+    userPost,
+    userDelete,
+    // userPatch 
+} = require('../controllers/users.controllers');
+const { isValidRole, emailExist, userExistById } = require('../helpers/db-validators');
 const { validateFields } = require('../middlewares/validate-fields')
 
+const Role = require('../models/role')
 
 const router = Router();
 
-router.get('/', userGet );
-
-router.get('/all', usersGet );
-
-router.put('/:id', usersPut );
-
-router.post('/', [ 
-    check('name','el nombre es obligatorio').isEmpty(),
-    check('name','el nombre no puede ser un email').not().isEmail(),
-    check('email','el email no es valido').isEmail(),
-    check('password','el password debe ser de mas de 6 letras').isLength(6),
-    // check('role','no es un rol válido').isIn(['ADMIN_ROLE', 'USER_ROLE']),
+router.get('/', usersGet);
+router.get('/:id', [
+    check('id').custom(userExistById),
     validateFields
- ], usersPost );
+], userGet);
 
-router.delete('/', usersDelete );
+// router.get('/all', userGet );
 
-router.patch('/', usersPatch );
+router.put('/:id', [
+    check('id', 'invalid ID').isMongoId(),
+    check('id').custom(userExistById),
+    check('role').custom(isValidRole),
+    check('email', 'email already in use').custom(emailExist),
+    check('password', 'password must be at least 6 charset').isLength(6),
+    validateFields
+], userPut);
+
+router.post('/', [
+    check('name', 'name is required').notEmpty(),
+    check('name', "name can't be an email address").not().isEmail(),
+    check('email', 'invalid email').isEmail(),
+    check('email', 'email is required').notEmpty(),
+    check('email', 'email already in use').custom(emailExist),
+    check('password', 'password must be at least 6 charset').isLength(6),
+    check('password', 'password is required').notEmpty(),
+    check('role').custom(isValidRole),
+    check('role', 'role is required').notEmpty(),
+    validateFields
+], userPost);
+
+router.delete('/:id', [
+    check('id', 'invalid ID').isMongoId(),
+    check('id').custom(userExistById),
+    validateFields
+], userDelete );
+
+// router.patch('/', userPatch );
 
 
 
