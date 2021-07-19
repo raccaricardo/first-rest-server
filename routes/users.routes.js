@@ -11,7 +11,6 @@ const { userGet,
 const { isValidRole, emailExist, userExistById } = require('../helpers/db-validators');
 const { validateFields } = require('../middlewares/validate-fields')
 
-const Role = require('../models/role')
 
 const router = Router();
 
