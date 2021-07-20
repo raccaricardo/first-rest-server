@@ -8,7 +8,7 @@ const { userGet,
     userDelete,
     // userPatch 
 } = require('../controllers/users.controllers');
-const { isValidRole, emailExist, userExistById } = require('../helpers/db-validators');
+const { isValidRole, emailExist, userExistById, PasswordIsNull, putEmailExist } = require('../helpers/db-validators');
 const { validateFields } = require('../middlewares/validate-fields')
 
 
@@ -25,9 +25,9 @@ router.get('/:id', [
 router.put('/:id', [
     check('id', 'invalid ID').isMongoId(),
     check('id').custom(userExistById),
-    check('role').custom(isValidRole),
-    check('email', 'email already in use').custom(emailExist),
-    check('password', 'password must be at least 6 charset').isLength(6),
+    // check('role').custom(isValidRole),
+    check('password' ).custom(PasswordIsNull),
+    check( 'email' ).custom(putEmailExist),
     validateFields
 ], userPut);
 

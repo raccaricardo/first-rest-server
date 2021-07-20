@@ -6,20 +6,40 @@ const isValidRole = async (role = '') => {
         throw new Error("Role doesn't exist ");
     }
 }
-const emailExist = async (email = '') =>{
+const emailExist = async (email = '') => {
     const emailExist = await User.findOne({ email });
     if (emailExist) {
-        throw new Error(`email: ${email} already registered`);        
+        throw new Error(`email: ${email} already registered`);
     }
 }
-const userExistById = async (id = '')=>{
-    const userExist = await User.findById( id );
-    if( !userExist ) {
+ 
+const PasswordIsNull = async (pass = '') => {
+    if ((pass !== '') && (pass.length < 6)) {
+        throw new Error(`password: must to be at least 6 charset `);
+    }
+
+}
+const userExistById = async (id = '') => {
+    const userExist = await User.findById(id);
+    if (!userExist) {
         throw new Error(`Id ${id} doesn't exist`);
     }
 }
-module.exports = { 
+
+
+const putEmailExist = async (email = '') => {
+    if ((email !== '')) {
+        const emailExist = await User.findOne({ email });
+        if (emailExist) {
+            throw new Error(`email: ${email} already registered`);
+        }
+    }
+
+}
+module.exports = {
     isValidRole,
     emailExist,
-    userExistById
+    userExistById,
+    PasswordIsNull,
+    putEmailExist
 }

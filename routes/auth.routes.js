@@ -6,9 +6,6 @@ const { login } = require('../controllers/auth.controllers')
 
 const router = Router();
 
-router.post('/login',{
-    // check('correo', 'El correo es obligatorio').isEmail();
-    
-} ,login );
+router.post('/login',login );
 
 module.exports = router;

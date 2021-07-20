@@ -11,22 +11,17 @@ class Server {
         this.connectDB();
         // Middlewares
         this.middlewares();
-
         // Rutas de mi aplicación
         this.routes();
     }
 
     middlewares() {
-
         // CORS
         this.app.use( cors() );
-
         // Lectura y parseo del body
         this.app.use( express.json() );
-
         // Directorio Público
         this.app.use( express.static('public') );
-
     }
 
     routes() {
@@ -37,8 +32,6 @@ class Server {
     }
     listen() {
         this.app.listen( this.port, () => {
-            console.log('Servidor corriendo en puerto', this.port );
-            
         });
     }
 

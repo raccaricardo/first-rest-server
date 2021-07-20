@@ -18,29 +18,29 @@ const userGet = async (req = request, res = response) => {
 const usersGet = async (req = request, res = response) => {
   let { limit = 5, from = 0 } = req.query;
 
-  ( isNaN( limit ) ) ? limit = 10 : true;
-  ( isNaN( from ) ) ? from = 0 : true;
+  (isNaN(limit)) ? limit = 10 : true;
+  (isNaN(from)) ? from = 0 : true;
   // const users = await User.find()
-  const query = { active: true };    
+  const query = { active: true };
   const resp = await Promise.all([
     User.countDocuments(query),
-    User.find( query )
-      .skip( Number( from ) )
-      .limit( Number( limit ) )    
+    User.find(query)
+      .skip(Number(from))
+      .limit(Number(limit))
   ])
-  const [totalUsers, users] = resp  ;
+  const [totalUsers, users] = resp;
   res.json({
-    totalUsers, 
+    totalUsers,
     users
-    
+
   });
 };
 const userPost = async (req = request, res = response) => {
- 
+
   const body = req.body;
   /**
    * const { address2, ...restantParameters} = req.body;
-   * const user = new User(restantParameters);//registra todos los parametros excepto address2
+   * const user = new User(restantParameters);
    */
   const {
     name,
@@ -52,11 +52,9 @@ const userPost = async (req = request, res = response) => {
     google = false,
   } = body;
   const user = new User({ name, email, password, img, role, active, google });
-  //verif if email exist
   // encrypt password
   const pass = await encryptpass(user.password);
   user.password = pass;
-  console.log("password encriptada:", pass);
   //save in db
   await user.save();
 
@@ -68,40 +66,41 @@ const userPost = async (req = request, res = response) => {
 
 const userPut = async (req, res = response) => {
   const { id } = req.params;
-  const { _id, password, google, ...remains } = req.body; //google no se actualiza porque lo extraemos de remains
+  const { _id, google, role, ...remains } = req.body; //registra todos los parametros excepto address2
+  //google no se actualiza porque lo extraemos de remains
   //TODO validate db 
-  if(password){
-   
-    const salt = bcrypt.genSaltSync();  
-    remains.password = bcrypt.hashSync(password, salt);
-    console.log(` password: ${password} password encriptada:${remains.password}`);
+  if (remains.password) {
+
+    // const salt = bcrypt.genSaltSync();
+    // const pass = await encryptpass(user.password);
+    
+    remains.password = encryptpass(password) ;
   }
-    const user = await User.findByIdAndUpdate(id, remains);
-    console.log(user);
-    delete remains.password;
+
+  for (var property in remains) {
+    if (remains[property] == "" || remains[property] == undefined) {
+      delete remains[property]; //eliminamos solo las claves vacias
+  }
+  }
+  const user = await User.findByIdAndUpdate(id, remains);
+  delete remains.password;
   res.json({
     remains
   });
 };
 
-// const userPatch = (req, res = response) => {
-//   res.json({
-//     msg: "patch API - userPatch",
-//   });
-// };
-
 const userDelete = async (req = request, res = response) => {
-  
+
   const { id } = req.params;
-  /*delete from id
+  /*delete by id
   const user = await User.findByIdAndDelete(id);
   */
   /*
   change state of user to active = false 
   */
-  const user = await User.findByIdAndUpdate(id, {active: false} );
+  const user = await User.findByIdAndUpdate(id, { active: false });
   res.json({
-    msg: "delete API - userDelete",
+    msg: "user Deleted",
     user
   });
 };
@@ -111,6 +110,5 @@ module.exports = {
   usersGet,
   userPost,
   userPut,
-  // userPatch,
   userDelete,
 };
