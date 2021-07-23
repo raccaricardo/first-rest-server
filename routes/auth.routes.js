@@ -1,11 +1,21 @@
 const { Router } = require('express');
-const { check } = require('express-validator');   
+const { check } = require('express-validator')
 
-
-const { login } = require('../controllers/auth.controllers')
+const { login } = require('../controllers/auth.controllers');
+const { validateFields } = require('../middlewares/validate-fields');
+const { validateJWT } = require('../middlewares/validate-jwt');
 
 const router = Router();
 
-router.post('/login',login );
+
+router.post('/login',[
+    // validateJWT,
+    check('email', 'email is required').notEmpty(),
+    check('email', 'invalid email').isEmail(),
+    check('password', "password field can\'t be empty").notEmpty(),
+    check('password', "password must be at least 6 charset").isLength(6),
+    validateFields
+],login );
+
 
 module.exports = router;

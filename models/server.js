@@ -8,6 +8,7 @@ class Server {
         this.app  = express();
         this.port = process.env.PORT;
         this.usersPath = '/api/users';
+        this.authPath = '/api/auth';
         this.connectDB();
         // Middlewares
         this.middlewares();
@@ -18,20 +19,23 @@ class Server {
     middlewares() {
         // CORS
         this.app.use( cors() );
-        // Lectura y parseo del body
+        // Lectura y parseo del body para recibir siempre un json en lugar de un script  
         this.app.use( express.json() );
         // Directorio Público
         this.app.use( express.static('public') );
     }
 
     routes() {
-        this.app.use( this.usersPath, require('../routes/users.routes'));
+        this.app.use( this.usersPath, require( '../routes/users.routes') );
+        this.app.use(this.authPath, require( '../routes/auth.routes') );
+
     }
     async connectDB(){
       await dbConnection();
     }
     listen() {
         this.app.listen( this.port, () => {
+            console.log("todo ok");
         });
     }
 

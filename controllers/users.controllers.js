@@ -37,7 +37,6 @@ const usersGet = async (req = request, res = response) => {
 };
 const userPost = async (req = request, res = response) => {
 
-  const body = req.body;
   /**
    * const { address2, ...restantParameters} = req.body;
    * const user = new User(restantParameters);
@@ -50,7 +49,7 @@ const userPost = async (req = request, res = response) => {
     role = "USER_ROLE",
     active = true,
     google = false,
-  } = body;
+  } = req.body;
   const user = new User({ name, email, password, img, role, active, google });
   // encrypt password
   const pass = await encryptpass(user.password);
@@ -91,17 +90,27 @@ const userPut = async (req, res = response) => {
 
 const userDelete = async (req = request, res = response) => {
 
+  /*delete from db by id
+    const user = await User.findByIdAndDelete(id);
+    */
+  //change state of user to active = false
+
   const { id } = req.params;
-  /*delete by id
-  const user = await User.findByIdAndDelete(id);
-  */
-  /*
-  change state of user to active = false 
-  */
+  const uid = req.uid;
+
+  const autenticatedUser = req.user;
+
+
+  
+  // const uid = req.uid;//from middlewares we can receive through req.something
+  
   const user = await User.findByIdAndUpdate(id, { active: false });
+  
+
   res.json({
     msg: "user Deleted",
-    user
+    user,
+    autenticatedUser
   });
 };
 

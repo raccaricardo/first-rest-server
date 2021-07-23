@@ -9,6 +9,8 @@ const { userGet,
     // userPatch 
 } = require('../controllers/users.controllers');
 const { isValidRole, emailExist, userExistById, PasswordIsNull, putEmailExist } = require('../helpers/db-validators');
+
+const { validateJWT } = require('../middlewares/validate-jwt');
 const { validateFields } = require('../middlewares/validate-fields')
 
 
@@ -45,6 +47,7 @@ router.post('/', [
 ], userPost);
 
 router.delete('/:id', [
+    validateJWT,
     check('id', 'invalid ID').isMongoId(),
     check('id').custom(userExistById),
     validateFields
