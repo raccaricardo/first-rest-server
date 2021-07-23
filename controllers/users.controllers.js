@@ -110,6 +110,7 @@ const userDelete = async (req = request, res = response) => {
   res.json({
     msg: "user Deleted",
     user,
+    uid,
     autenticatedUser
   });
 };

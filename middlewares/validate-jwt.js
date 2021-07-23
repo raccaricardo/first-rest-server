@@ -8,7 +8,7 @@ const validateJWT = async (req = request, res = response, next) => {
     const token = req.header('x-token');
 
     if (!token) {
-        res.status(401).json({
+        return res.status(401).json({
             token,
             msg: 'Token not received'
         })
@@ -16,16 +16,18 @@ const validateJWT = async (req = request, res = response, next) => {
 
     try {
         const { uid } = jwt.verify(token, process.env.SECRETORPUBLIC_KEY);
-        req.uid = uid;
+        req.uid = uid; 
         const user = await User.findById(uid);
         if ( !user ) {
-            res.status(401).json({
+            return res.status(401).json({
                 msg: 'invalid token- user not found in db'
             })
+        }else{
+            req.user = user;
         }
 
         if (!user.active || !user.role === 'ADMIN_ROLE') {
-            res.status(401).json({
+            return res.status(401).json({
                 msg: 'invalid token- user eliminated or without privilege'
             })
         }

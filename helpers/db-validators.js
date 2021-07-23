@@ -36,6 +36,7 @@ const putEmailExist = async (email = '') => {
     }
 
 }
+
 module.exports = {
     isValidRole,
     emailExist,
