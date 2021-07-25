@@ -16,7 +16,7 @@ const isAdminRole = (req = request, res = response, next)=> {
     next();
 }
 //to verify if have any of roles of parameters
-const haveRoles = ( ...roles )=>{
+const haveAnyRoles = ( ...roles )=>{
 //... to transform arguments on array named: roles
     return ( req = request, res = response, next) => {
         if(!req.user){
@@ -35,5 +35,5 @@ const haveRoles = ( ...roles )=>{
 
 module.exports= { 
     isAdminRole,
-    haveRoles
+    haveAnyRoles
 }

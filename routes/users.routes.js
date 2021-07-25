@@ -11,6 +11,8 @@ const { userGet,
 } = require('../controllers/users.controllers');
 const { 
     isValidRole, 
+    isAdminRole,
+    haveAnyRoles,
     emailExist, 
     userExistById, 
     PasswordIsNull, 
@@ -22,7 +24,7 @@ const {
     validateJWT, 
     validateFields, 
     isAdminRole, 
-    haveRoles 
+    haveAnyRoles
 } = require('../middlewares'); // const require {} = require('../middlewares/index');
 const router = Router();
 
@@ -58,8 +60,8 @@ router.post('/', [
 
 router.delete('/:id', [
     validateJWT,
-    // isAdminRole,
-    haveRoles('ADMIN_ROLE', 'SALES_ROLE', 'NOSE_ROLE'),
+    isAdminRole,
+    // haveAnyRoles('ADMIN_ROLE', 'SALES_ROLE', 'NOSE_ROLE'),
     check('id', 'invalid ID').isMongoId(),
     check('id').custom(userExistById),
     validateFields
