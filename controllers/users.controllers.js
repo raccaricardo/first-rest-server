@@ -70,8 +70,6 @@ const userPut = async (req, res = response) => {
   //TODO validate db 
   if (remains.password) {
 
-    // const salt = bcrypt.genSaltSync();
-    // const pass = await encryptpass(user.password);
     
     remains.password = encryptpass(password) ;
   }

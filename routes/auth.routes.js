@@ -1,7 +1,10 @@
 const { Router } = require('express');
 const { check } = require('express-validator')
 
-const { login } = require('../controllers/auth.controllers');
+const { 
+    login, 
+    loginGoogle
+ } = require('../controllers/auth.controllers');
 const { validateFields } = require('../middlewares/validate-fields');
 const { validateJWT } = require('../middlewares/validate-jwt');
 
@@ -16,6 +19,9 @@ router.post('/login',[
     check('password', "password must be at least 6 charset").isLength(6),
     validateFields
 ],login );
-
+router.post('/login/google', [
+    check('id_token', "id_token is required").notEmpty(),
+    validateFields
+], loginGoogle);
 
 module.exports = router;
