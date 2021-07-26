@@ -11,8 +11,7 @@ const { userGet,
 } = require('../controllers/users.controllers');
 const { 
     isValidRole, 
-    isAdminRole,
-    haveAnyRoles,
+    
     emailExist, 
     userExistById, 
     PasswordIsNull, 
@@ -29,6 +28,7 @@ const {
 const router = Router();
 
 router.get('/', usersGet);
+
 router.get('/:id', [
     check('id').custom(userExistById),
     validateFields

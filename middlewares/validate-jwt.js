@@ -13,7 +13,6 @@ const validateJWT = async (req = request, res = response, next) => {
             msg: 'Token not received'
         })
     }
-
     try {
         const { uid } = jwt.verify(token, process.env.SECRETORPUBLIC_KEY);
         req.uid = uid; 
