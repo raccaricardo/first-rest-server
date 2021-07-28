@@ -37,9 +37,10 @@ router.get('/:id', [
 // router.get('/all', userGet );
 
 router.put('/:id', [
+    validateJWT,
     check('id', 'invalid ID').isMongoId(),
     check('id').custom(userExistById),
-    // check('role').custom(isValidRole),
+    check('role').custom(isValidRole),
     check('password' ).custom(PasswordIsNull),
     check( 'email' ).custom(putEmailExist),
     validateFields
@@ -52,9 +53,7 @@ router.post('/', [
     check('email', 'email is required').notEmpty(),
     check('email', 'email already in use').custom(emailExist),
     check('password', 'password must be at least 6 charset').isLength(6),
-    check('password', 'password is required').notEmpty(),
-    check('role').custom(isValidRole),
-    check('role', 'role is required').notEmpty(),
+    check('password', 'password is required').notEmpty(),    
     validateFields
 ], userPost);
 

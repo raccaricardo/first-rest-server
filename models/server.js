@@ -7,8 +7,9 @@ class Server {
     constructor() {
         this.app  = express();
         this.port = process.env.PORT;
-        this.usersPath = '/api/users';
         this.authPath = '/api/auth';
+        this.usersPath = '/api/users';
+        // this.rolePath = '/api/role';
         this.connectDB();
         // Middlewares
         this.middlewares();

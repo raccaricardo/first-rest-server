@@ -4,6 +4,7 @@ const bcrypt = require('bcryptjs');
 
 
 const User = require("../models/user");
+const Role = require("../models/role");
 const { encryptpass } = require("../helpers/encrypt");
 
 
@@ -36,12 +37,11 @@ const usersGet = async (req = request, res = response) => {
   });
 };
 const userPost = async (req = request, res = response) => {
-
   /**
    * const { address2, ...restantParameters} = req.body;
    * const user = new User(restantParameters);
    */
-  const {
+  let {
     name,
     email,
     password,
@@ -50,6 +50,9 @@ const userPost = async (req = request, res = response) => {
     active = true,
     google = false,
   } = req.body;
+  const roleExist = await Role.findOne({ role });
+  if(!roleExist) role = 'USER_ROLE';
+  
   const user = new User({ name, email, password, img, role, active, google });
   // encrypt password
   const pass = await encryptpass(user.password);
@@ -68,21 +71,26 @@ const userPut = async (req, res = response) => {
   const { _id, google, role, ...remains } = req.body; //registra todos los parametros excepto address2
   //google no se actualiza porque lo extraemos de remains
   //TODO validate db 
+  const { uid } = req;
+  const userReq = await User.findById(uid);
+  const isAdmin = userReq.role === 'ADMIN_ROLE';
+  if(id !== uid || !isAdmin){
+    return res.status(401).json({ 
+      msg: "doesn't have permissions"
+    })
+  }
   if (remains.password) {
-
-    
     remains.password = encryptpass(password) ;
   }
-
   for (var property in remains) {
     if (remains[property] == "" || remains[property] == undefined) {
       delete remains[property]; //eliminamos solo las claves vacias
   }
   }
-  const user = await User.findByIdAndUpdate(id, remains);
+  await User.findByIdAndUpdate(id, remains);
   delete remains.password;
   res.json({
-    remains
+    msg: "user info updated"
   });
 };
 
@@ -92,24 +100,16 @@ const userDelete = async (req = request, res = response) => {
     const user = await User.findByIdAndDelete(id);
     */
   //change state of user to active = false
-
   const { id } = req.params;
   const uid = req.uid;
 
   const autenticatedUser = req.user;
-
-
-  
-  // const uid = req.uid;//from middlewares we can receive through req.something
-  
+    // const uid = req.uid;//from middlewares we can receive through req.something
   const user = await User.findByIdAndUpdate(id, { active: false });
-  
 
   res.json({
     msg: "user Deleted",
-    user,
-    uid,
-    autenticatedUser
+    user
   });
 };
 
